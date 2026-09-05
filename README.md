@@ -4,6 +4,16 @@
 
 A full-stack Todo application built as a technical assignment for Ziptrrip. It provides complete task management (create, view, edit, delete, complete/pending toggling) along with search and filtering, backed by a REST API and a PostgreSQL database via Prisma. The frontend is implemented as a true Multiple Page Application (MPA) using two separate Vite/React entry points rather than a single-page client-side router.
 
+## Application Screenshots
+
+### Todo List Page
+
+![Todo List Page](./screenshots/home_page_image.png)
+
+### Todo Details Page
+
+![Todo Details Page](./screenshots/todo_details.png)
+
 ## Features
 
 - **Create Todo** — add a new todo with title, description, priority, and due date
