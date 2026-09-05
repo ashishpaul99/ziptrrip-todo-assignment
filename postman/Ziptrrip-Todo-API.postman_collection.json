@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "Ziptrrip Todo API",
+    "description": "REST API collection for the Ziptrrip Todo application. Covers Create, Read, Update, Toggle, and Delete operations for todos, including search and filtering via query parameters. Base URL and todo ID are collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "todoId",
+      "value": "",
+      "type": "string",
+      "description": "Set this to a real todo's id (from a Create or Get All response) before running requests that require an ID."
+    }
+  ],
+  "item": [
+    {
+      "name": "Todo",
+      "item": [
+        {
+          "name": "Create Todo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete Ziptrrip assignment\",\n  \"description\": \"Build full stack todo application\",\n  \"priority\": \"HIGH\",\n  \"dueDate\": \"2026-09-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos"]
+            },
+            "description": "Creates a new todo.\n\nBody validation (Zod `createTodoSchema`):\n- `title` (string, required, 1-100 chars)\n- `description` (string, optional, max 500 chars)\n- `priority` (\"LOW\" | \"MEDIUM\" | \"HIGH\", optional, defaults to \"MEDIUM\")\n- `dueDate` (string, optional, must be YYYY-MM-DD)\n\nOn success returns `201` with `{ success: true, data: <todo> }`.\nOn validation failure returns `400` with `{ success: false, message: \"Validation failed\", errors: [...] }`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todos?search=assignment&status=pending&priority=HIGH&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "assignment",
+                  "description": "Case-insensitive match against title or description. Remove to disable."
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "\"pending\" or \"completed\". Omit (or remove) for all statuses."
+                },
+                {
+                  "key": "priority",
+                  "value": "HIGH",
+                  "description": "\"LOW\" | \"MEDIUM\" | \"HIGH\". Omit for all priorities."
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number, defaults to 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page, defaults to 10."
+                }
+              ]
+            },
+            "description": "Returns a paginated list of todos, optionally filtered by search, status, and priority.\n\nQuery parameters (all optional):\n- `search`: matches title or description (case-insensitive contains)\n- `status`: \"pending\" | \"completed\"\n- `priority`: \"LOW\" | \"MEDIUM\" | \"HIGH\"\n- `page`: page number (default 1)\n- `limit`: items per page (default 10)\n\nResponse shape: `{ success: true, data: Todo[], pagination: { page, limit, total, totalPages } }`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Todo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos", "{{todoId}}"]
+            },
+            "description": "Fetches a single todo by id.\n\nReturns `200` with `{ success: true, data: <todo> }` if found, or `404` with `{ success: false, message: \"Todo not found\" }` if not."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Todo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete Ziptrrip assignment (updated)\",\n  \"description\": \"Build and polish full stack todo application\",\n  \"priority\": \"MEDIUM\",\n  \"completed\": false,\n  \"dueDate\": \"2026-09-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos", "{{todoId}}"]
+            },
+            "description": "Updates an existing todo by id. All fields are optional (partial update); include only the fields you want to change.\n\nBody validation (Zod `updateTodoSchema`):\n- `title` (string, optional, 1-100 chars, cannot be empty if provided)\n- `description` (string, optional, max 500 chars, nullable to clear it)\n- `priority` (\"LOW\" | \"MEDIUM\" | \"HIGH\", optional)\n- `completed` (boolean, optional)\n- `dueDate` (string, optional, YYYY-MM-DD, nullable to clear it)\n\nOn success returns `200` with `{ success: true, data: <todo> }`."
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Todo Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todos/{{todoId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos", "{{todoId}}", "toggle"]
+            },
+            "description": "Flips the `completed` status of the todo (pending -> completed, completed -> pending). No request body needed.\n\nReturns `200` with `{ success: true, data: <todo> }` if found, or `404` with `{ success: false, message: \"Todo not found\" }` if not."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Todo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "todos", "{{todoId}}"]
+            },
+            "description": "Deletes the todo by id.\n\nReturns `200` with `{ success: true, message: \"Todo deleted successfully\" }` if found and deleted, or `404` with `{ success: false, message: \"Todo not found\" }` if not."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
