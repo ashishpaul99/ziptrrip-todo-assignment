@@ -1,9 +1,10 @@
 node_modules
 dist
-generated
+dist-ssr
 
-# Keep environment variables out of version control
+# Environment variables
 .env
+.env.local
 
 # AI / editor / dev-tool artifacts
 .agents
